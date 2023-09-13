@@ -12,12 +12,13 @@ This Python package can be suitable for the astrometric detection of habitable p
         |
         —————— C  ——————...Pyrhon——————...LICENSE.md——————...README.md
                |                |
-                ————             ————PyMsOfa.py
+                ————makefile     ————PyMsOfa.py
                |                |
-                ————             ————PyMsOfa_t.py
-
-
-
+                ————sofa.h       ————PyMsOfa_t.py
+               |
+                ————sofa_a.c
+               |
+                ————sofam.h
 ```
 
 ## Documentation
