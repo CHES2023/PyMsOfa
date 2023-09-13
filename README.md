@@ -21,6 +21,38 @@ This Python package can be suitable for the astrometric detection of habitable p
                 ————sofam.h
 ```
 
+## Installation
+
+Put the files in the C folder in the same directory.
+
+### For windows
+
+Use the following command in CMD.
+```
+mingw32-make
+```
+If this fails, please install [TDM-GCC](https://jmeubank.github.io/tdm-gcc/download/).
+
+Then put the newly generated libsofa_c.so file in the same directory as PyMsOfa.py in the Python folder.
+
+### For macOS
+
+Use the following command in Terminal.
+```
+make
+```
+Then put the newly generated libsofa_c.so file in the same directory as PyMsOfa.py in the Python folder.
+
+### For Linux
+Use the following command in Terminal.
+```
+make
+```
+And then
+```
+ln -s libsofa_c.so /usr/lib/libsofa_c.so
+```
+
 ## Documentation
 
 For package documentation please refer to the underlying SOFA documentation at:
