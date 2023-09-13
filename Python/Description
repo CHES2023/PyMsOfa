@@ -1,0 +1,2 @@
+PyMsOfa.py : Python module, run with the libsofa_c.so generated in the C folder
+PyMsOfa_t.py : test file
