@@ -64,7 +64,7 @@ PyMsOfa is a Python module for accessing the [International Astronomical Union](
 
 PyMsOfa is not a port of SOFA routines but a wrapper around the SOFA_C library. Thus, no calculations are made into the pysofa software, they are all delegated to the underlying SOFA_C library.
 
-PyMsOfa is neither distributed, supported nor endorsed by the International Astronomical Union. In addition to pysofa’s license, any use of this module should comply with [SOFA’s license and terms of use](http://www.iausofa.org/tandc.html). Especially, but not exclusively, any published work or commercial products including results achieved by using PyMsOfa shall acknowledge that the SOFA software was used to obtain those results.
+PyMsOfa is neither distributed, supported nor endorsed by the International Astronomical Union. In addition to PyMsOfa’s license, any use of this module should comply with [SOFA’s license and terms of use](http://www.iausofa.org/tandc.html). Especially, but not exclusively, any published work or commercial products including results achieved by using PyMsOfa shall acknowledge that the SOFA software was used to obtain those results.
 
 
 ## Reference
