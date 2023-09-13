@@ -71,6 +71,14 @@ PyMsOfa is neither distributed, supported nor endorsed by the International Astr
 In case you use all or part of the present code, please include a citation to the following paper:
 
 ```
-@article{
+@article{ji2022ches,
+	title={CHES: a space-borne astrometric mission for the detection of habitable planets of the nearby solar-type stars},
+	author={Ji, Jiang-Hui and Li, Hai-Tao and Zhang, Jun-Bo and Fang, Liang and Li, Dong and Wang, Su and Cao, Yang and Deng, Lei and Li, Bao-Quan and Xian, Hao and others},
+	journal={Research in Astronomy and Astrophysics},
+	volume={22},
+	number={7},
+	pages={072003},
+	year={2022},
+	publisher={IOP Publishing}
 }
 ```
