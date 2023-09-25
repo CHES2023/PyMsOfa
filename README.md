@@ -6,7 +6,7 @@ This package is a Python wrapper for the Standards of Fundamental Astronomy (SOF
 This Python package can be suitable for the astrometric detection of habitable planets of the Closeby Habitable Exoplanet Survey (CHES) mission and for the frontier themes of black holes and dark matter related to astrometric calculations and other fields.
 
 ## Structure
-```bash
+```
 ├─ C
     ├─makefile			#makefile
     ├─sofa.h			#header file
