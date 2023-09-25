@@ -8,25 +8,27 @@ This Python package can be suitable for the astrometric detection of habitable p
 ## Structure
 ```bash
 ├─ C
-    ├─makefile
-    ├─sofa.h
-    ├─sofa_a.c
-    ├─sofam.h
-                 # All configurations live there
+    ├─makefile			#makefile
+    ├─sofa.h			#header file
+    ├─sofa_a.c			#integrated all 247 routines in SOFAservice 
+    ├─sofam.h			#header file
 ├─ Example
-    ├─makefile               # Notebooks to get started with multimodal datasets and models
-├─ eval.py                 # Eval script
-├─ insall.sh               # Installation script for DeepViewAgg
-├─ scripts                 # Some scripts to help manage the project
-├─ torch_points3d
-    ├─ core                # Core components
-    ├─ datasets            # All code related to datasets
-    ├─ metrics             # All metrics and trackers
-    ├─ models              # All models
-    ├─ modules             # Basic modules that can be used in a modular way
-    ├─ utils               # Various utils
-    └─ visualization       # Visualization
-└─ train.py                # Main script to launch a training
+    ├─Application in CHES	               
+    	├─Fig4.png		#Figure 4 in paper
+    	├─Fig4.py		#Programs to generate Figure 4
+    	├─input.xls		#Input parameters obtained from Gaia DR3
+    ├─Precession-nutation.py	#Programs on precession-nutation
+    ├─coordinate.py		#Programs on coordinate
+    ├─time.py			#Programs on time
+├─ Python			#Python module, run with the libsofa_c.so generated in the C folder
+    ├─PyMsOfa.py		#Contains all 247 routines
+    ├─PyMsOfa_astrometry.py	#Astrometry section of PyMsOfa.py
+    ├─PyMsOfa_basic.py		#Basic section of PyMsOfa.py
+    ├─PyMsOfa_earth_attitude.py	#Earth attitude section of PyMsOfa.py
+    ├─PyMsOfa_t.py		#Test file
+    ├─PyMsOfa_time.py           #Time section of PyMsOfa.py
+├─ LICENSE.md                 
+├─ README.md
 ```
 
 ## Installation
