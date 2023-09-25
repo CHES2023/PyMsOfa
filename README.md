@@ -6,19 +6,27 @@ This package is a Python wrapper for the Standards of Fundamental Astronomy (SOF
 This Python package can be suitable for the astrometric detection of habitable planets of the Closeby Habitable Exoplanet Survey (CHES) mission and for the frontier themes of black holes and dark matter related to astrometric calculations and other fields.
 
 ## Structure
-```
-|
-———— PyMsOfa
-        |
-        —————— C  ——————...Pyrhon——————...LICENSE.md——————...README.md
-               |                |
-                ————makefile     ————PyMsOfa.py
-               |                |
-                ————sofa.h       ————PyMsOfa_t.py
-               |                |
-                ————sofa_a.c     ————Description
-               |
-                ————sofam.h
+```bash
+├─ C
+    ├─makefile
+    ├─sofa.h
+    ├─sofa_a.c
+    ├─sofam.h
+                 # All configurations live there
+├─ Example
+    ├─makefile               # Notebooks to get started with multimodal datasets and models
+├─ eval.py                 # Eval script
+├─ insall.sh               # Installation script for DeepViewAgg
+├─ scripts                 # Some scripts to help manage the project
+├─ torch_points3d
+    ├─ core                # Core components
+    ├─ datasets            # All code related to datasets
+    ├─ metrics             # All metrics and trackers
+    ├─ models              # All models
+    ├─ modules             # Basic modules that can be used in a modular way
+    ├─ utils               # Various utils
+    └─ visualization       # Visualization
+└─ train.py                # Main script to launch a training
 ```
 
 ## Installation
