@@ -10,7 +10,7 @@ This Python package can be suitable for the astrometric detection of habitable p
 ├─ C
     ├─makefile			#makefile
     ├─sofa.h			#header file
-    ├─sofa_a.c			#integrated all 247 routines in SOFAservice 
+    ├─sofa_a.c			#integrated all 247 routines in SOFA service 
     ├─sofam.h			#header file
 ├─ Example
     ├─Application in CHES	               
@@ -20,13 +20,23 @@ This Python package can be suitable for the astrometric detection of habitable p
     ├─Precession-nutation.py	#Programs on precession-nutation
     ├─coordinate.py		#Programs on coordinate
     ├─time.py			#Programs on time
-├─ Python			#Python module, run with the libsofa_c.so generated in the C folder
+├─ ctype                        #Ctype version, run with the libsofa_c.so generated in the C folder
     ├─PyMsOfa.py		#Contains all 247 routines
-    ├─PyMsOfa_astrometry.py	#Astrometry section of PyMsOfa.py
-    ├─PyMsOfa_basic.py		#Basic section of PyMsOfa.py
-    ├─PyMsOfa_earth_attitude.py	#Earth attitude section of PyMsOfa.py
+    ├─PyMsOfa_astrometry.py	#Astrometry module of PyMsOfa.py
+    ├─PyMsOfa_basic.py		#Basic module of PyMsOfa.py
+    ├─PyMsOfa_earth_attitude.py	#Earth attitude module of PyMsOfa.py
     ├─PyMsOfa_t.py		#Test file
-    ├─PyMsOfa_time.py           #Time section of PyMsOfa.py
+    ├─PyMsOfa_time.py           #Time module of PyMsOfa.py
+├─ cffi                         #Cffi version, run with the libsofa_c.so generated in the C folder
+    ├─PyMsOfa.py		#Contains all 247 routines
+    ├─PyMsOfa_astrometry.py	#Astrometry module of PyMsOfa.py
+    ├─PyMsOfa_basic.py		#Basic module of PyMsOfa.py
+    ├─PyMsOfa_earth_attitude.py	#Earth attitude module of PyMsOfa.py
+    ├─PyMsOfa_t.py		#Test file
+    ├─PyMsOfa_time.py           #Time module of PyMsOfa.py
+├─ Python			#Python version
+    ├─PyMsOfa.py		#Contains all 247 routines
+    ├─PyMsOfa_t.py		#Test file
 ├─ LICENSE.md                 
 ├─ README.md
 ```
