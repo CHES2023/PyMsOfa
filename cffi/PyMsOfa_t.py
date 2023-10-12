@@ -8,7 +8,7 @@ Created on Wed Mar 15 23:01:06 2023
 """
 import numpy  as  np
 from   cffi  import FFI
-import sofa_cffi  as  sf
+import PyMsOfa  as  sf
  
  
 def   line():
