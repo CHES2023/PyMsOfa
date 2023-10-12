@@ -28,14 +28,14 @@ This Python package can be suitable for the astrometric detection of habitable p
     ├─Precession-nutation.py	#Programs on precession-nutation
     ├─coordinate.py		#Programs on coordinate
     ├─time.py			#Programs on time
-├─ ctype                        #Ctype version, run with the libsofa_c.so generated in the C folder
+├─ cffi                         #Cffi version, run with the libsofa_c.so generated in the C folder
     ├─PyMsOfa.py		#Contains all 247 routines
     ├─PyMsOfa_astrometry.py	#Astrometry module of PyMsOfa.py
     ├─PyMsOfa_basic.py		#Basic module of PyMsOfa.py
     ├─PyMsOfa_earth_attitude.py	#Earth attitude module of PyMsOfa.py
     ├─PyMsOfa_t.py		#Test file
     ├─PyMsOfa_time.py           #Time module of PyMsOfa.py
-├─ cffi                         #Cffi version, run with the libsofa_c.so generated in the C folder
+├─ ctype                        #Ctype version, run with the libsofa_c.so generated in the C folder
     ├─PyMsOfa.py		#Contains all 247 routines
     ├─PyMsOfa_astrometry.py	#Astrometry module of PyMsOfa.py
     ├─PyMsOfa_basic.py		#Basic module of PyMsOfa.py
