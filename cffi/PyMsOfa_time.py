@@ -523,18 +523,6 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 
 """)
 
-
-'''
-#2023-08-15
-#lib = ffi.dlopen('E:/python/cffi/libsofa_c.so')
-#ref. from pysofa_ctypes#for windows
-if   pf.system().lower()   == 'windows':
-          lib = ffi.dlopen('E:\Python\p2c\libsofa_c.so')
-#for linux 
-elif pf.system().lower() == 'linux':  
-          lib = ffi.dlopen('./libsofa_c.so')
-'''
-
 '''
    Descr: return file name/path information
 #      Input: 
