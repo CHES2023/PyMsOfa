@@ -104,6 +104,15 @@ To cite PyMsOfa in publications use:
 
 A BibTeX entry for LaTeX users is
 ```bibtex
+@misc{ji2023pymsofa,
+      title={PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service}, 
+      author={Jianghui Ji and Dongjie Tan and Chunhui Bao and Xiumin Huang and Shoucun Hu and Yao Dong and Su Wang},
+      year={2023},
+      eprint={2310.08673},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.IM}
+}
+
 @article{2022RAA....22g2003J,
        author = {{Ji}, Jiang-Hui and {Li}, Hai-Tao and {Zhang}, Jun-Bo and {Fang}, Liang and {Li}, Dong and {Wang}, Su and {Cao}, Yang and {Deng}, Lei and {Li}, Bao-Quan and {Xian}, Hao and {Gao}, Xiao-Dong and {Zhang}, Ang and {Li}, Fei and {Liu}, Jia-Cheng and {Qi}, Zhao-Xiang and {Jin}, Sheng and {Liu}, Ya-Ning and {Chen}, Guo and {Li}, Ming-Tao and {Dong}, Yao and {Zhu}, Zi and {CHES Consortium}},
         title = "{CHES: A Space-borne Astrometric Mission for the Detection of Habitable Planets of the Nearby Solar-type Stars}",
