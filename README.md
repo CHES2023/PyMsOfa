@@ -108,13 +108,21 @@ To cite PyMsOfa in publications use:
 
 A BibTeX entry for LaTeX users is
 ```bibtex
-@misc{ji2023pymsofa,
-      title={PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service}, 
-      author={Jianghui Ji and Dongjie Tan and Chunhui Bao and Xiumin Huang and Shoucun Hu and Yao Dong and Su Wang},
-      year={2023},
-      eprint={2310.08673},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.IM}
+@ARTICLE{2023arXiv231008673J,
+       author = {{Ji}, Jianghui and {Tan}, Dongjie and {Bao}, Chunhui and {Huang}, Xiumin and {Hu}, Shoucun and {Dong}, Yao and {Wang}, Su},
+        title = "{PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service}",
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Astrophysics of Galaxies, Astrophysics - Solar and Stellar Astrophysics},
+         year = 2023,
+        month = oct,
+          eid = {arXiv:2310.08673},
+        pages = {arXiv:2310.08673},
+          doi = {10.48550/arXiv.2310.08673},
+archivePrefix = {arXiv},
+       eprint = {2310.08673},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023arXiv231008673J},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 @article{2022RAA....22g2003J,
