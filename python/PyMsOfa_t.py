@@ -1413,7 +1413,7 @@ line()
 print("Testing pymPnm80...")
 DATE1 = 2400000.5
 DATE2 = 50123.9999
-print(sf.pymPnM80(DATE1, DATE2))
+print(sf.pymPnm80(DATE1, DATE2))
 
 line()
 print("Testing pymPom00...")
@@ -1453,7 +1453,7 @@ line()
 print("Testing pymPv2p...")
 PV = [[0.3, 1.2, -2.5],
       [-0.5, 3.1, 0.9]]
-print(sf.pymPV2P(PV))
+print(sf.pymPv2p(PV))
 
 line()
 print("Testing pymPv2s...")
@@ -1467,7 +1467,7 @@ A = [[2.0, 2.0, 3.0],
       [6.0, 0.0, 4.0]]
 B = [[1.0, 3.0, 4.0],
       [0.0, 2.0, 8.0]]
-print(sf.pymPVDPV(A, B))
+print(sf.pymPvdpv(A, B))
 
 line()
 print("Testing pymPvm...")
