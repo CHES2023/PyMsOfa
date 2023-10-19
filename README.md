@@ -9,7 +9,7 @@ This package is a Python package for the Standards of Fundamental Astronomy (SOF
 
 (3) a python package directly written in pure python codes from SOFA subroutines. 
 
-It implements all 247 functions in the SOFA service and is based on the latest version released on May 12, 2021.
+It implements all 247 functions in the SOFA service and is based on the latest version released on Oct 11, 2023.
 
 This Python package can be suitable for the astrometric detection of habitable planets of the Closeby Habitable Exoplanet Survey (CHES) mission and for the frontier themes of black holes and dark matter related to astrometric calculations and other fields.
 
