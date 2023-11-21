@@ -102,26 +102,29 @@ PyMsOfa is neither distributed, supported nor endorsed by the International Astr
 ## Citation
 
 To cite PyMsOfa in publications use:
-> 1.    Ji, Jiang-Hui, Tan, Dong-jie, Bao, Chun-hui, Huang, Xiu-min, Hu, Shoucun, Dong, Yao, Wang, Su. 2023, PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service, Research in Astronomy and Astrophysics, https://doi.org/10.1088/1674-4527/ad0499
+
+> 1.    Ji, Jiang-Hui, Tan, Dong-jie, Bao, Chun-hui, Huang, Xiu-min, Hu, Shoucun, Dong, Yao, Wang, Su. 2023, PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service, Research in Astronomy and Astrophysics, 23, 125015,  doi:[10.1088/1674-4527/ad0499](https://doi.org/10.1088/1674-4527/ad0499)
 > 2.	Ji, Jiang-Hui, Li, Hai-Tao, Zhang, Jun-Bo, Fang, Liang, Li, Dong, Wang, Su, Cao, Yang, Deng, Lei, Li, Bao-Quan, Xian, Hao, Gao, Xiao-Dong, Zhang, Ang, Li, Fei, Liu, Jia-Cheng, Qi, Zhao-Xiang,  Jin, Sheng, Liu, Ya-Ning, Chen, Guo, Li, Ming-Tao, Dong, Yao, Zhu, Zi, and CHES Consortium. 2022, CHES: A Space-borne Astrometric Mission for the Detection of Habitable Planets of the Nearby Solar-type Stars, Research in Astronomy and Astrophysics, 22, 072003
 
 
 A BibTeX entry for LaTeX users is
 ```bibtex
-@ARTICLE{2023arXiv231008673J,
+@ARTICLE{2023RAA....23l5015J,
        author = {{Ji}, Jianghui and {Tan}, Dongjie and {Bao}, Chunhui and {Huang}, Xiumin and {Hu}, Shoucun and {Dong}, Yao and {Wang}, Su},
         title = "{PyMsOfa: A Python Package for the Standards of Fundamental Astronomy (SOFA) Service}",
-      journal = {arXiv e-prints},
-     keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Astrophysics of Galaxies, Astrophysics - Solar and Stellar Astrophysics},
+      journal = {Research in Astronomy and Astrophysics},
+     keywords = {Astrometry and Celestial Mechanics, planets and satellites: detection, planets and satellites: terrestrial planets, Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Astrophysics of Galaxies, Astrophysics - Solar and Stellar Astrophysics},
          year = 2023,
-        month = oct,
-          eid = {arXiv:2310.08673},
-        pages = {arXiv:2310.08673},
-          doi = {10.48550/arXiv.2310.08673},
+        month = dec,
+       volume = {23},
+       number = {12},
+          eid = {125015},
+        pages = {125015},
+          doi = {10.1088/1674-4527/ad0499},
 archivePrefix = {arXiv},
        eprint = {2310.08673},
  primaryClass = {astro-ph.IM},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2023arXiv231008673J},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023RAA....23l5015J},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
