@@ -1,5 +1,5 @@
 # PyMsOfa
-[![arXiv](https://img.shields.io/badge/arxiv-2310.08673-b31b1b.svg)](https://arxiv.org/abs/2310.08673) | [Paper](https://doi.org/10.1088/1674-4527/ad0499) | ![Python](https://img.shields.io/badge/Python-3.0-green.svg)|[![PyPI version](https://badge.fury.io/py/PyMsOfa.svg)](https://badge.fury.io/py/PyMsOfa)|[![zenodo](https://img.shields.io/badge/zenodo-10052216-blue.svg)](https://zenodo.org/records/10052216)|
+[![arXiv](https://img.shields.io/badge/arxiv-2310.08673-b31b1b.svg)](https://arxiv.org/abs/2310.08673) | [Paper](https://doi.org/10.1088/1674-4527/ad0499) | ![Python](https://img.shields.io/badge/Python-3.0-green.svg)|[![PyPI version](https://badge.fury.io/py/PyMsOfa.svg)](https://badge.fury.io/py/PyMsOfa)|[![zenodo](https://img.shields.io/badge/zenodo-10052216-blue.svg)](https://zenodo.org/records/10052216)|[![ASCL(https://img.shields.io/badge/ASCL-2312.018-385E0F)](https://ascl.net/2312.018)|
 
 This package is a Python package for the Standards of Fundamental Astronomy (SOFA) service of the International Astronomical Union (IAU). It implements the python package PyMsOfa for SOFA service in three ways: 
 
