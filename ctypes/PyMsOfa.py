@@ -39,60 +39,51 @@ import platform as pf
 def getFileName(filepath):
 
     __file__  = filepath
-    
+
     dirname   = os.path.dirname(__file__)
     fullname  = os.path.split(__file__)[-1]
     filename  = os.path.split(__file__)[-1].split('.')[0]
     extension = os.path.split(__file__)[-1].split('.')[1]
-    
+
     return dirname, fullname, filename, extension
 
-     
-def getFilePath(filepath):
 
+def getFilePath(filepath):
     __file__  = filepath
-    
+
     dirname   = os.path.dirname(__file__)
     fullname  = os.path.split(__file__)[-1]
     filename  = os.path.split(__file__)[-1].split('.')[0]
     extension = os.path.split(__file__)[-1].split('.')[1]
-    
-    return dirname 
+
+    return dirname
 
 #place libsofa_c.so in the same directory with PyMsOfa.py
 cur_dir    = sys.argv[0]
 #dirname, fullname, filename, extension = getFileName(cur_dir)
 dirname    = getFilePath(cur_dir)
 libs_file  = 'libsofa_c.so'
-libs_path  = os.path.join(dirname, libs_file) 
 #lib       = CDLL(libs_path)
 
 
+print(pf.system().lower())
 #'''
 #for windows
 if   pf.system().lower() == 'windows':
-           
-          #user_path  = './'
-          #libs_file  = 'libsofa_c.so'
-          #libs_path  = user_path + libs_file
-          #print(libs_path)
-          #lib  = CDLL(libs_path)
-           
-          #print(libs_path)
-          lib  = CDLL(libs_path)
-           
-#for linux 
-elif pf.system().lower() == 'linux':  
-          dirname = os.getcwd()
-          lib     = CDLL(os.path.join(dirname, libs_file)) 
-          #lib = CDLL('./libsofa_c.so')
-          #print(libs_path)
-          #lib  = CDLL(libs_path)
- 
-#for macOS
-elif pf.system().lower() == 'darwin':  
+          libs_file  = 'libsofa_c.dll'
 
-          lib  = CDLL(libs_path)
+#for linux
+elif pf.system().lower() == 'linux':
+          dirname = os.getcwd()
+          #lib = CDLL('./libsofa_c.so')
+
+#for macOS
+elif pf.system().lower() == 'darwin':
+          pass
+
+
+libs_path  = os.path.join(dirname, libs_file)
+lib  = CDLL(libs_path)
 
 #'''
 
