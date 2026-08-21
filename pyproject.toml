@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PyMsOfa"
+version = "2.0.0"
+description = "A pure Python/NumPy package for the Standards of Fundamental Astronomy (SOFA) service"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Ji, Jianghui", email = "jijh@pmo.ac.cn" },
+]
+maintainers = [
+    { name = "Ji, Jianghui", email = "jijh@pmo.ac.cn" },
+]
+keywords = [
+    "astronomy",
+    "astrometry",
+    "SOFA",
+    "IAU",
+    "fundamental astronomy",
+    "time scales",
+    "precession",
+    "nutation",
+    "CHES",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+    "numpy>=1.17",
+]
+
+[project.urls]
+Homepage = "https://github.com/CHES2023/PyMsOfa"
+Repository = "https://github.com/CHES2023/PyMsOfa"
+Paper = "https://doi.org/10.1088/1674-4527/ad0499"
+"Bug Tracker" = "https://github.com/CHES2023/PyMsOfa/issues"
+
+[tool.setuptools]
+packages = ["PyMsOfa"]
