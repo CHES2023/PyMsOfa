@@ -1,0 +1,673 @@
+%-- coding: UTF-8 --
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper,margin=2.2cm}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black}
+
+\title{\bfseries PyMsOfa 2.x\\ 包介绍与函数简介}
+\author{PMO}
+\date{2026 年 8 月}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{简介}
+
+PyMsOfa 是国际天文学联合会（IAU）基本天文标准（SOFA）服务的一个 Python 实现，
+命名规则为 \texttt{iauXxx} $\rightarrow$ \texttt{pymXxx}，覆盖全部 \textbf{247} 个 SOFA
+例程，用于时间系统、岁差--章动、地球自转、坐标系变换、天体测量与星历等基本天文计算。
+
+\textbf{第二版（2.x）是彻底重写的纯 Python + NumPy 实现}：无 C 库、无编译、跨平台，
+全部例程与常量直接平铺在顶层命名空间，并统一采用抛出异常的错误处理方式。与第一版
+（1.x，ctypes / cffi / 纯 python 三后端并依赖编译的 C 库 \texttt{sofa\_a.c}）的主要区别：
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ & 1.x & 2.x \\ \hline
+实现方式 & ctypes/cffi/纯 python + C 库 & 纯 Python + NumPy \\ \hline
+编译 C 库 & 需要，Windows 下 PyPI 安装后 ctypes/cffi 不可用 & 不需要，全平台可用 \\ \hline
+导入方式 & \texttt{from PyMsOfa import python as sf} & \texttt{import PyMsOfa as sf} \\ \hline
+错误处理 & 返回值末尾带整数状态码 & 统一抛出 \texttt{ValueError} \\ \hline
+向量化 & 仅标量 & 标量 + NumPy 数组广播 \\ \hline
+ASTROM/LDBODY & ctypes 结构体 / 30 元列表 & 普通 Python 类（字段名不变） \\ \hline
+\end{tabular}
+\end{table}
+
+本文对函数的功能与用法进行了简要介绍，可作为使用 PyMsOfa 2.x 时的参考。
+SOFA 的详细功能请参阅：
+\href{http://www.iausofa.org/cookbooks.html}{http://www.iausofa.org/cookbooks.html}
+
+\textbf{PyMsOfa 获取：}
+
+Github：\href{https://github.com/CHES2023/PyMsOfa/}{https://github.com/CHES2023/PyMsOfa/}
+
+PyPI：\href{https://pypi.org/project/PyMsOfa/}{https://pypi.org/project/PyMsOfa/}（\texttt{pip install PyMsOfa}）
+
+若本包对您的程序、工作有所帮助，请做以下引用：
+
+> 1. Ji, Jiang-Hui, Tan, Dong-jie, Bao, Chun-hui, Huang, Xiu-min, Hu, Shoucun,
+Dong, Yao, Wang, Su. 2023, PyMsOfa: A Python Package for the Standards of
+Fundamental Astronomy (SOFA) Service, Research in Astronomy and Astrophysics, 23,
+125015, \href{https://doi.org/10.1088/1674-4527/ad0499}{doi:10.1088/1674-4527/ad0499}
+
+> 2. Ji, Jiang-Hui, Li, Hai-Tao, et al. 2022, CHES: A Space-borne Astrometric
+Mission for the Detection of Habitable Planets of the Nearby Solar-type Stars,
+Research in Astronomy and Astrophysics, 22, 072003.
+
+\newpage
+\section{基础计算工具类}
+在本节中主要介绍一些在 SOFA 的函数中要用到的基础计算工具。这些函数非常基础，并不涉及
+任何复杂的理论知识，但被 SOFA 的其他函数调用，了解其构成便于理解其他函数。
+
+在 SOFA 函数中通常用到 5 种参数：(1) 单独的一个数值或字符串；(2) 一个向量，通常为三维；
+(3) 由一个位置向量和一个速度向量组合而成的 $2\times3$ 矩阵，本文称为位置-速度向量；
+(4) 天体测量参数，用 \texttt{pymASTROM} 表示（2.x 中为普通 Python 类）；
+(5) 一个 $3\times3$ 矩阵，通常用来做旋转变换等。
+
+\subsection{复制一个参数}
+\texttt{pymCp}: 复制一个三维向量
+
+\texttt{pymCpv}: 复制一个位置-速度向量
+
+\texttt{pymCr}: 复制一个 $3\times3$ 矩阵
+
+\subsection{初始化 / 归零一个参数}
+\texttt{pymZp}: 返回一个归零的三维向量
+
+\texttt{pymZpv}: 返回一个归零的位置-速度向量
+
+\texttt{pymZr}: 返回一个归零的 $3\times3$ 矩阵
+
+\texttt{pymIr}: 返回一个 $3\times3$ 单位矩阵
+
+\subsection{对角度的规范化}
+在 SOFA 函数中会涉及输出经度、纬度等参数，计算过程中会涉及三角函数及反三角函数，
+因此需要将结果规范化。
+
+\texttt{pymAnp}: 将角度规范化到 $0\sim2\pi$ 范围内
+
+\texttt{pymAnpm}: 将角度规范化到 $-\pi\sim+\pi$ 范围内
+
+\subsection{参数处理}
+\texttt{pymPm}: 计算向量的模
+
+\texttt{pymPn}: 将向量分解成它的模和一个单位向量（返回顺序：模、单位向量）
+
+\texttt{pymTr}: 转置一个 $3\times3$ 矩阵
+
+\texttt{pymPv2p}: 从一个位置-速度向量中分解出位置向量
+
+\texttt{pymPvm}: 计算位置-速度向量的模，位置、速度分别计算
+
+\subsection{参数运算}
+\texttt{pymPpp}: 两个三维向量相加
+
+\texttt{pymPmp}: 两个三维向量相减
+
+\texttt{pymSxp}: 标量乘以一个三维向量
+
+\texttt{pymPpsp}: 一个三维向量加上一个缩放之后的三维向量
+
+\texttt{pymPdp}: 两个三维向量内积（点乘）
+
+\texttt{pymRxp}: 一个向量乘以一个 $3\times3$ 矩阵
+
+\texttt{pymTrxp}: 一个向量乘以一个 $3\times3$ 矩阵的转置
+
+\texttt{pymRxpv}: 一个位置-速度向量乘以一个 $3\times3$ 矩阵
+
+\texttt{pymTrxpv}: 一个位置-速度向量乘以一个 $3\times3$ 矩阵的转置
+
+\texttt{pymPxp}: 两个三维向量外积（叉乘）
+
+\texttt{pymRxr}: 两个 $3\times3$ 矩阵相乘
+
+\texttt{pymPvppv}: 两个位置-速度向量相加
+
+\texttt{pymPvmpv}: 两个位置-速度向量相减
+
+\texttt{pymPvdpv}: 两个位置-速度向量内积（点乘），(Ap,Av) 和 (Bp,Bv) 的内积为
+(Ap·Bp, Ap·Bv+Av·Bp)
+
+\texttt{pymPvxpv}: 两个位置-速度向量外积（叉乘），(Ap,Av) 和 (Bp,Bv) 的外积为
+(Ap×Bp, Ap×Bv+Av×Bp)
+
+\texttt{pymSxpv}: 一个标量乘以位置-速度向量
+
+\texttt{pymS2xpv}: 两个标量分别乘以位置-速度向量中的位置分量和速度分量
+
+\subsection{矩阵绕轴旋转}
+\texttt{pymRx}: 一个 $3\times3$ 矩阵绕 X 轴旋转一个角度
+
+\texttt{pymRy}: 一个 $3\times3$ 矩阵绕 Y 轴旋转一个角度
+
+\texttt{pymRz}: 一个 $3\times3$ 矩阵绕 Z 轴旋转一个角度
+
+\subsection{参数的坐标转换}
+\texttt{pymC2s}: 将笛卡尔坐标系下的三维向量转换为球坐标系下的经纬坐标
+
+\texttt{pymS2c}: 将球坐标系下的经纬坐标转换为笛卡尔坐标系下的三维向量（支持数组）
+
+\texttt{pymP2s}: 将笛卡尔坐标系下的三维向量转换为球极坐标（经纬坐标和径向距离）
+
+\texttt{pymS2p}: 将球极坐标（经纬坐标和径向距离）转换为笛卡尔三维向量
+
+\texttt{pymPv2s}: 将位置-速度向量转换到球坐标下的经纬角、径向距离及三者的变化速率
+
+\texttt{pymS2pv}: 将球坐标下的经纬角、径向距离及变化速率转换到位置-速度向量
+
+\texttt{pymPvstar}: 将位置-速度向量转换到星表坐标（赤经、赤纬、自行、视差、视向速度）
+
+\texttt{pymStarpv}: 将星表坐标转换到位置-速度向量
+
+\subsection{旋转向量与旋转矩阵之间的转换}
+旋转向量：方向为旋转轴，大小为旋转角度。
+
+\texttt{pymRv2m}: 将三维旋转矢量变换为 $3\times3$ 旋转矩阵
+
+\texttt{pymRm2v}: 将 $3\times3$ 旋转矩阵变换为三维旋转矢量
+
+\subsection{参数间的位置关系}
+\texttt{pymPas}: 球坐标系下两点间的方位角
+
+\texttt{pymPap}: 两个三维向量之间的方位角
+
+\texttt{pymSeps}: 球坐标系下两点间的角度差
+
+\texttt{pymSepp}: 两个三维向量之间的角度差
+
+\subsection{投影关系}
+观测中天体的位置从球面投影到平面，因此天体的球面位置和平面位置之间就存在一个由切点
+位置联系起来的投影关系。
+
+\texttt{pymTpors}: 由天体在平面上的直角坐标及天体球面坐标，给出切点的球面坐标
+
+\texttt{pymTporv}: 由天体在平面上的直角坐标及天体方向余弦，给出切点的方向余弦
+
+\texttt{pymTpsts}: 由天体在平面上的直角坐标及切点球面坐标，给出天体的球面坐标
+
+\texttt{pymTpstv}: 由天体在平面上的直角坐标及切点方向余弦，给出天体的方向余弦
+
+\texttt{pymTpxes}: 由天体球面坐标及切点球面坐标，给出天体在平面上的直角坐标
+
+\texttt{pymTpxev}: 由天体方向余弦及切点方向余弦，给出天体在平面上的直角坐标
+
+\subsection{其他函数}
+\texttt{pymP2pv}: 三维位置向量添加零速度向量，扩展为位置-速度向量
+
+\texttt{pymPvu}: 根据速度分量，将位置-速度向量中的位置分量更新到给定日期
+
+\texttt{pymPvup}: 同上，同时舍弃速度分量
+
+\newpage
+\section{时间}
+
+\subsection{恒星时}
+\texttt{pymGmst82}: 由给定的 UT1，给出格林尼治平恒星时，依据 IAU 1982
+
+\texttt{pymGst94}: 由给定的 UT1，给出格林尼治真恒星时，依据 IAU 1982/94
+
+\texttt{pymGmst00}: 由给定的 UT1 和 TT，给出格林尼治平恒星时，依据 IAU 2000
+
+\texttt{pymGst00a}: 由给定的 UT1 和 TT，给出格林尼治真恒星时，依据 IAU 2000
+
+\texttt{pymGst00b}: 由给定的 UT1，给出格林尼治真恒星时，依据 IAU 2000，采用 IAU 2000B 章动截断模型
+
+\texttt{pymGmst06}: 由给定的 UT1 和 TT，给出格林尼治平恒星时，依据 IAU 2006 岁差模型
+
+\texttt{pymGst06}: 由给定的 UT1、TT 和 NPB 矩阵，给出格林尼治真恒星时，依据 IAU 2006
+
+\texttt{pymGst06a}: 由给定的 UT1 和 TT，给出格林尼治真恒星时，依据 IAU 2000 与 IAU 2006
+
+\subsection{时制转换}
+SOFA 中有 3 种表示时间/角度的方式：(1) 以天为单位；(2) 以时、分、秒为单位；
+(3) 以度、角分、角秒为单位。
+
+\texttt{pymD2tf}: 将以天为单位的时制转换为时分秒
+
+\texttt{pymTf2d}: 将时分秒转换为以天为单位
+
+\texttt{pymA2af}: 将弧度转换为度、角分、角秒
+
+\texttt{pymAf2a}: 将度、角分、角秒转换为弧度
+
+\texttt{pymA2tf}: 将弧度转换为时、分、秒
+
+\texttt{pymTf2a}: 将时、分、秒转换为弧度
+
+\subsection{日期转换}
+在 SOFA 中日期通常由两个参数表达。例如儒略日 JD=2450123.7 可按以下方式表示：
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+参数1 & 参数2 & 类型 \\ \hline
+2450123.7 & 0.0 & 儒略日的一般表达 \\ \hline
+2451545.0 & -1421.3 & 以 J2000.0 为零点的表达 \\ \hline
+2400000.5 & 50123.2 & 约简儒略日的表达 \\ \hline
+2450123.5 & 0.2 & 日期+小数（一天内的时间） \\ \hline
+\end{tabular}
+\end{table}
+
+其中约简儒略日由儒略日零点 2400000.5（公元 1858 年 11 月 17 日 $0^h$ UT）和约简后的
+儒略日组成，两参数相加即为儒略日。
+
+\texttt{pymCal2jd}: 将公历日期转换到约简儒略日
+
+\texttt{pymJd2cal}: 将两参数表示的儒略日转换到公历
+
+\texttt{pymJdcalf}: 将儒略日转换到公历，并额外指定输出精度
+
+\texttt{pymEpj}: 儒略日转换到儒略历元
+
+\texttt{pymEpj2jd}: 儒略历元转换到儒略日
+
+\texttt{pymEpb}: 儒略日转换到贝塞尔历元
+
+\texttt{pymEpb2jd}: 贝塞尔历元转换到儒略日
+
+\subsection{时间转换}
+包含的时间类型：UT、UT1、UTC、TAI、TT、TDB、TCG 等。
+
+协调世界时 UTC 与国际原子时 TAI 的秒长一致，但时刻上要求与世界时接近。自 1972 年起两者的
+差值保持在 $\pm0.9$ 秒以内，因此每年年中或年底会对 UTC 做一整秒的调整（正跳秒/负跳秒）。
+2022 年 11 月国际计量局（BIPM）已决定到 2035 年取消闰秒。
+
+\texttt{pymDat}: 给定 UTC 日期，给出 UTC 与 TAI 之间的时间差（包含 2023 年底前的所有跳秒）
+
+\texttt{pymDtf2d}: UTC 时间转换为两参数的儒略日
+
+\texttt{pymD2dtf}: 两参数的儒略日转换为 UTC 时间（正确输出闰秒 23:59:60）
+
+\texttt{pymUtctai}: 协调世界时转换为国际原子时 (UTC $\Rightarrow$ TAI)
+
+\texttt{pymTaiutc}: 国际原子时转换为协调世界时 (TAI $\Rightarrow$ UTC)
+
+\texttt{pymTaiut1}: 国际原子时转换为世界时 (TAI $\Rightarrow$ UT1)
+
+\texttt{pymUt1tai}: 世界时转换为国际原子时 (UT1 $\Rightarrow$ TAI)
+
+\texttt{pymUtcut1}: 协调世界时转换为世界时 (UTC $\Rightarrow$ UT1)
+
+\texttt{pymUt1utc}: 世界时转换为协调世界时 (UT1 $\Rightarrow$ UTC)
+
+\texttt{pymTaitt}: 国际原子时转换为地球时 (TAI $\Rightarrow$ TT)
+
+\texttt{pymTttai}: 地球时转换为国际原子时 (TT $\Rightarrow$ TAI)
+
+\texttt{pymTttcg}: 地球时转换为地心坐标时 (TT $\Rightarrow$ TCG)
+
+\texttt{pymTcgtt}: 地心坐标时转换为地球时 (TCG $\Rightarrow$ TT)
+
+\texttt{pymTttdb}: 地球时转换为质心力学时 (TT $\Rightarrow$ TDB)
+
+\texttt{pymTdbtt}: 质心力学时转换为地球时 (TDB $\Rightarrow$ TT)
+
+\texttt{pymTtut1}: 地球时转换为世界时 (TT $\Rightarrow$ UT1)
+
+\texttt{pymUt1tt}: 世界时转换为地球时 (UT1 $\Rightarrow$ TT)
+
+\texttt{pymTdbtcb}: 质心力学时转换为质心坐标时 (TDB $\Rightarrow$ TCB)
+
+\texttt{pymTcbtdb}: 质心坐标时转换为质心力学时 (TCB $\Rightarrow$ TDB)
+
+\texttt{pymDtdb}: 对于地球上的观测者，TDB 与 TT 之间的时间差
+
+\newpage
+\section{岁差、章动和极移}
+
+\subsection{太阳系内天体参数}
+由给定的质心力学时（TDB，其值接近 TT），给出太阳系内天体的参数。
+
+\texttt{pymFapa03}: 黄经的一般累计岁差，基于 IERS 2003
+
+\texttt{pymFae03}: 地球的平黄经，基于 IERS 2003
+
+\texttt{pymFad03}: 月亮到太阳的平均距角，基于 IERS 2003
+
+\texttt{pymFaom03}: 月亮升交点的平黄经，基于 IERS 2003
+
+\texttt{pymFaf03}: 月球平黄经减去其升交点平黄经，基于 IERS 2003
+
+\texttt{pymFal03}: 月亮的平近点角，基于 IERS 2003
+
+\texttt{pymFalp03}: 太阳的平近点角，基于 IERS 2003
+
+\texttt{pymFame03}: 水星的平黄经，基于 IERS 2003
+
+\texttt{pymFave03}: 金星的平黄经，基于 IERS 2003
+
+\texttt{pymFama03}: 火星的平黄经，基于 IERS 2003
+
+\texttt{pymFaju03}: 木星的平黄经，基于 IERS 2003
+
+\texttt{pymFasa03}: 土星的平黄经，基于 IERS 2003
+
+\texttt{pymFaur03}: 天王星的平黄经，基于 IERS 2003
+
+\texttt{pymFane03}: 海王星的平黄经，基于 IERS 2003
+
+\texttt{pymPlan94}: 按编号给出各行星的近似日心位置和速度（1水星、2金星、3地月质心、4火星、
+5木星、6土星、7天王星、8海王星）
+
+\texttt{pymMoon98}: 月球的近似地心位置和速度
+
+\subsection{参考架偏差-岁差-章动-极移的变换矩阵}
+参考架偏差（frame bias）是 ICRS 与 J2000.0 平赤道间的偏离：GCRS 的极与 J2000.0 平极的偏差，
+以及春分点相对于 J2000.0 平动力学春分点的赤经偏差。
+
+\texttt{pymNumat}: 根据黄道平均倾角及章动量构建章动矩阵
+
+\texttt{pymLtp}: 长期岁差矩阵
+
+\texttt{pymLtpb}: 长期岁差矩阵，包括 ICRS 参考架偏差
+
+\texttt{pymLtpequ}: 赤道的长期岁差
+
+\texttt{pymLtpecl}: 黄道的长期岁差
+
+\texttt{pymPrec76}: 给出两个给定日期之间的三个岁差旋转角，依据 IAU 1976 岁差模型
+
+\texttt{pymPmat76}: 给出自 J2000.0 到给定日期的岁差矩阵，依据 IAU 1976 岁差模型
+
+\texttt{pymPnm80}: 给出岁差-章动矩阵，依据 IAU 1976 岁差模型和 IAU 1980 章动模型
+
+\texttt{pymNut80}: 章动，依据 IAU 1980 模型
+
+\texttt{pymNutm80}: 构建章动矩阵，依据 IAU 1980 模型
+
+\texttt{pymObl80}: 黄道相对于平赤道的倾角，依据 IAU 1980 模型
+
+\texttt{pymEqeq94}: 赤经章动（分点差），依据 IAU 1994 模型
+
+\texttt{pymBi00}: 参考架偏差的三个分量，依据 IAU 2000 岁差-章动模型
+
+\texttt{pymPr00}: 岁差改正部分，依据 IAU 2000 岁差速率部分及 MHB 2000
+
+\texttt{pymBp00}: 参考架偏差矩阵、岁差矩阵及其乘积，依据 IAU 2000 模型
+
+\texttt{pymPmat00}: 从 GCRS 到指定日期的岁差矩阵（含参考架偏差），依据 IAU 2000 模型
+
+\texttt{pymEe00}: 赤经章动，给定经度章动和平均倾角，依据 IAU 2000 模型
+
+\texttt{pymEe00a}: 赤经章动，章动与倾角由 SOFA 内部函数给出，依据 IAU 2000 模型
+
+\texttt{pymEe00b}: 赤经章动，依据 IAU 2000 模型，但采用 IAU 2000B 章动截断模型
+
+\texttt{pymEect00}: 赤经章动的补充项，依据 IAU 2000 模型
+
+\texttt{pymNut00a}: 章动，依据 IAU 2000A 模型
+
+\texttt{pymNut00b}: 章动，依据 IAU 2000B 模型
+
+\texttt{pymPn00}: 给定章动量，给出（1）黄道相对平赤道的倾角，（2）参考架偏差矩阵，
+（3）岁差矩阵，（4）参考架偏差-岁差矩阵，（5）章动矩阵，（6）参考架偏差-岁差-章动矩阵
+（BPN），依据 IAU 2000 模型
+
+\texttt{pymPn00a}: 功能同 pymPn00，章动量由内部函数给出并输出，依据 IAU 2000A 章动模型
+
+\texttt{pymNum00a}: 构建章动矩阵，依据 IAU 2000A 模型
+
+\texttt{pymPn00b}: 功能同 pymPn00a，依据 IAU 2000B 章动模型
+
+\texttt{pymNum00b}: 构建章动矩阵，依据 IAU 2000B 模型
+
+\texttt{pymEra00}: 给定日期（UT1）的地球自转角
+
+\texttt{pymSp00}: 给定日期（TT）的 TIO（地球中间零点）定位角
+
+\texttt{pymPom00}: 由 CIP 坐标和 TIO 定位角构建极移矩阵，依据 IAU 2000
+
+\texttt{pymPnm00a}: 参考架偏差-岁差-章动矩阵，依据 IAU 2000A 模型
+
+\texttt{pymPnm00b}: 参考架偏差-岁差-章动矩阵，依据 IAU 2000B 模型
+
+\texttt{pymS00}: 根据 CIO 的 X,Y 坐标，计算 CIO 定位角 s
+
+\texttt{pymS00a}: CIO 定位角，依据 IAU 2000A 岁差章动模型
+
+\texttt{pymS00b}: CIO 定位角，依据 IAU 2000B 岁差章动模型
+
+\texttt{pymXys00a}: CIP 的 X,Y 坐标及 CIO 定位角 s，依据 IAU 2000A 岁差章动模型
+
+\texttt{pymXys00b}: CIP 的 X,Y 坐标及 CIO 定位角 s，依据 IAU 2000B 岁差章动模型
+
+\texttt{pymBp06}: 参考架偏差矩阵、岁差矩阵及其乘积，依据 IAU 2006 模型
+
+\texttt{pymNut06a}: 对 IAU 2000A 章动进行调整，依据 IAU 2006 岁差模型
+
+\texttt{pymObl06}: 黄道的平均倾角，依据 IAU 2006 岁差模型
+
+\texttt{pymPfw06}: 获得 4 个岁差角，依据 IAU 2006 模型
+
+\texttt{pymEe06a}: 赤经章动，依据 IAU 2000 决议和 IAU 2006/2000A 岁差章动模型
+
+\texttt{pymPn06}: 给定章动量，给出倾角与各矩阵（同 pymPn00），依据 IAU 2006 模型
+
+\texttt{pymPn06a}: 功能同 pymPn06，章动量由内部函数给出，依据 IAU 2006 模型与 IAU 2000A 章动模型
+
+\texttt{pymNum06a}: 构建章动矩阵，依据 IAU 2006/2000A 模型
+
+\texttt{pymPnm06a}: 偏差-岁差-章动矩阵，依据 IAU 2006 岁差和 IAU 2000A 章动模型
+
+\texttt{pymPb06}: 自 J2000.0 到给定日期的三个岁差旋转角（含参考架偏差），依据 IAU 2006 模型
+
+\texttt{pymPmat06}: 从 GCRS 到指定日期的岁差矩阵（含参考架偏差），依据 IAU 2006 模型
+
+\texttt{pymP06e}: 岁差角，基于 IAU 2006 春分点
+
+\texttt{pymS06}: CIO 定位角，依据 IAU 2006/2000A 岁差章动
+
+\texttt{pymS06a}: CIO 定位角，依据 IAU 2006/2000A 岁差章动模型
+
+\texttt{pymXy06}: CIP 的 X,Y 坐标，依据 IAU 2006 岁差和 IAU 2000A 章动模型
+
+\texttt{pymXys06a}: CIP 的 X,Y 坐标及 CIO 定位角 s，依据 IAU 2006 岁差和 IAU 2000A 章动模型
+
+\texttt{pymFw2m}: 由四个 FW 角获得旋转矩阵（用于计算 NPB）
+
+\texttt{pymFw2xy}: 由四个 FW 角获得旋转矩阵，并提取 CIP 的 X,Y 分量
+
+\newpage
+\section{坐标系的变换}
+
+\texttt{pymEform}: 根据编号（1：WGS84；2：GRS80；3：WGS72）获得地球参考椭球参数
+（赤道半径和扁率）
+
+\texttt{pymGd2gce}: 将给定参数参考椭球下的大地坐标转换为地心坐标
+
+\texttt{pymGd2gc}: 将参考椭球下的大地坐标转换为地心坐标（椭球参数按编号由内部函数获得）
+
+\texttt{pymGc2gde}: 将给定参数参考椭球下的地心坐标转换为大地坐标
+
+\texttt{pymGc2gd}: 将地心坐标转换为参考椭球下的大地坐标（椭球参数按编号由内部函数获得）
+
+\texttt{pymAe2hd}: 地平坐标到第一赤道坐标：方位角、高度 $\Rightarrow$ 时角、赤纬
+
+\texttt{pymHd2ae}: 第一赤道坐标到地平坐标：时角、赤纬 $\Rightarrow$ 方位角、高度
+
+\texttt{pymHd2pa}: 时角、赤纬 $\Rightarrow$ 星位角
+
+\texttt{pymLtecm}: ICRS 赤道到黄道旋转矩阵
+
+\texttt{pymLteqec}: 从 ICRS 赤经赤纬转换到黄道坐标，依据长期岁差模型
+
+\texttt{pymLteceq}: 从黄道坐标转换到 ICRS 赤经赤纬，依据长期岁差模型
+
+\texttt{pymIcrs2g}: 从 ICRS 坐标转换到银道坐标
+
+\texttt{pymG2icrs}: 从银道坐标转换到 ICRS 坐标
+
+\texttt{pymFk425}: 将 FK4 (B1950.0) 星表恒星位置转换到 FK5 (J2000.0)
+
+\texttt{pymFk45z}: 将 FK4 (B1950.0) 星表恒星位置转换到 FK5 (J2000.0)，假设 FK5 中自行为 0
+
+\texttt{pymFk524}: 将 FK5 (J2000.0) 星表恒星位置转换到 FK4 (B1950.0)
+
+\texttt{pymFk54z}: 将 FK5 (J2000.0) 星表恒星位置转换到 FK4 (B1950.0)，假设 FK5 中自行为 0
+
+\texttt{pymFk5hip}: FK5 到依巴谷的旋转矩阵和自转向量
+
+\texttt{pymFk52h}: 将 FK5 (J2000.0) 恒星位置转换到依巴谷系统
+
+\texttt{pymFk5hz}: 将 FK5 (J2000.0) 恒星位置转换到依巴谷系统，假设依巴谷中自行为零
+
+\texttt{pymH2fk5}: 将依巴谷恒星位置转换到 FK5 (J2000.0)
+
+\texttt{pymHfk5z}: 将依巴谷恒星位置转换到 FK5 (J2000.0)，假设依巴谷中自行为零
+
+\texttt{pymEcm06}: ICRS 赤道到黄道的旋转矩阵，依据 IAU 2006 模型
+
+\texttt{pymEceq06}: 平春分点和平黄道上的黄道坐标转换到 ICRS 赤道坐标，依据 IAU 2006 岁差模型
+
+\texttt{pymEqec06}: ICRS 赤道坐标转换到平春分点和平黄道上的黄道坐标，依据 IAU 2006 岁差模型
+
+\texttt{pymStarpm}: 根据恒星空间运动（视差、自行、视向速度）更新星表
+
+\texttt{pymPmsafe}: 同上，并对视差为零的情况特殊处理
+
+\newpage
+\section{天体测量参数}
+
+\texttt{pymEpv00}: 质心天球参考系下的地球位置和速度（日心和太阳系质心）
+
+\texttt{pymAb}: 光行差改正，将天体的原方向转化为本征方向
+
+\texttt{pymPmpx}: 根据恒星位置、自行、视差、视向速度及观测者相对太阳系质心的速度，
+给出一定时间间隔（PMT）后恒星的位置
+
+\texttt{pymRefco}: 基于气压、温度、相对湿度、观测波长，确定大气折射模型常数 A 和 B
+
+\texttt{pymPvtob}: 地面观测站的位置和速度
+
+\texttt{pymC2ixy}: 通过 CIP 单位向量的 X,Y 分量，给出从天球到中间参考系的矩阵
+
+\texttt{pymC2ixys}: 通过 CIP 的 X,Y 坐标及 CIO 定位角构建从天球到中间参考系的矩阵
+
+\texttt{pymC2ibpn}: 通过参考架偏差-岁差-章动矩阵，给出从天球到中间参考系的矩阵
+
+\texttt{pymC2i00a}: 通过内部函数获得 NPB 矩阵，给出从天球到中间参考系的矩阵，依据 IAU 2000A
+
+\texttt{pymC2i00b}: 同上，依据 IAU 2000B 岁差章动模型
+
+\texttt{pymC2i06a}: 从天球到中间参考系的矩阵，依据 IAU 2006 岁差和 IAU 2000A 章动模型
+
+\texttt{pymEors}: 由 NPB 矩阵和 CIO 定位角 s，给出零点差
+
+\texttt{pymEo06a}: 零点差，依据 IAU 2006 岁差和 IAU 2000A 章动模型
+
+\texttt{pymBpn2xy}: 从偏差-岁差-章动矩阵中提取 CIP 的 X,Y 坐标
+
+\texttt{pymC2tcio}: 基于 CIO 的构成（RC2I、地球自转角、极移矩阵），给出从天球到地球的矩阵
+
+\texttt{pymC2t00a}: 基于时间、极移及 IAU 2000A 岁差章动模型，给出从天球到地球的矩阵
+
+\texttt{pymC2t00b}: 同上，依据 IAU 2000B 岁差章动模型
+
+\texttt{pymC2t06a}: 同上，依据 IAU 2006/2000A 岁差章动模型
+
+\texttt{pymC2teqx}: 基于春分点的构成（BPN、GAST、极移矩阵），给出从天球到地球的矩阵
+
+\texttt{pymC2tpe}: 基于时间、UT1、章动和极移（IAU 2000），给出从天球到地球的矩阵
+
+\texttt{pymC2txy}: 基于地球时、UT1、CIP 坐标和极移（IAU 2000），给出从天球到地球的矩阵
+
+\subsection{太阳系内天体对光线的偏转}
+\texttt{pymLd}: 考虑太阳系内单个天体对光线的偏转效应
+
+\texttt{pymLdn}: 考虑太阳系内多个天体对光线的偏转效应
+
+\texttt{pymLdsun}: 仅考虑太阳对光线的偏转效应
+
+\subsection{基于天体测量参数 ASTROM 的坐标转换}
+在 2.x 中，ASTROM 为普通 Python 类（\texttt{pymASTROM}），字段名与 SOFA 一致，无需再
+预分配 30 元列表，各函数会直接返回 ASTROM 对象。
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+函数 & 观测者 & 转换 \\ \hline
+pymApcg / pymApcg13 & 地心 & ICRS $\leftrightarrow$ GCRS \\ \hline
+pymApci / pymApci13 & 地面 & ICRS $\leftrightarrow$ CIRS \\ \hline
+pymApco / pymApco13 & 地面 & ICRS $\leftrightarrow$ 观测坐标 \\ \hline
+pymApcs / pymApcs13 & 空间 & ICRS $\leftrightarrow$ GCRS \\ \hline
+pymAper / pymAper13 & 地面 & 更新地球自转角 \\ \hline
+pymApio / pymApio13 & 地面 & CIRS $\leftrightarrow$ 观测坐标 \\ \hline
+\end{tabular}
+\end{table}
+表中后缀 13 表示部分参数（如地球星历、CIP/CIO、折射参数）由 SOFA 内部函数提供。
+
+\subsubsection{生成 ASTROM 参数}
+\texttt{pymApcg}: 地心观测者，预制 ICRS 与 GCRS 之间转换的恒星无关天体测量参数
+
+\texttt{pymApcg13}: 同上，地球星历由 SOFA 内部函数提供
+
+\texttt{pymApci}: 地心观测者，预制 ICRS 与 CIRS 之间转换的恒星无关天体测量参数
+
+\texttt{pymApci13}: 同上，地球星历及 CIP/CIO 由 SOFA 内部函数提供
+
+\texttt{pymApco}: 地面观测者，预制 ICRS 与观测坐标之间转换的恒星无关天体测量参数
+
+\texttt{pymApco13}: 同上，地球星历、CIP/CIO 及折射参数由 SOFA 内部函数提供
+
+\texttt{pymApcs}: 已知自身地心坐标和速度的观测者，预制 ICRS 与 GCRS 之间转换的参数
+
+\texttt{pymApcs13}: 同上，地球星历由 SOFA 内部函数提供
+
+\texttt{pymAper}: 在天体测量参数中更新本地地球自转角
+
+\texttt{pymAper13}: 同上，仅需给出日期（UT），地球自转角由 SOFA 内部函数提供
+
+\texttt{pymApio}: 地面观测者，预制 CIRS 与观测坐标之间转换的恒星无关天体测量参数
+
+\texttt{pymApio13}: 同上，折射参数由 SOFA 内部函数计算
+
+\subsubsection{使用 ASTROM 参数}
+\texttt{pymAtccq}: 由 ASTROM 参数将恒星 ICRS 星表位置转换为 ICRS 天体测量位置
+
+\texttt{pymAtcc13}: 同上，输入时间，由 SOFA 内部函数计算 ASTROM
+
+\texttt{pymAtciq}: 由 pymApci[13] 获得的 ASTROM，将恒星 ICRS 坐标转换为 CIRS 天体测量位置
+
+\texttt{pymAtci13}: 同上，输入时间，由 SOFA 内部函数计算 ASTROM
+
+\texttt{pymAtciqn}: 在 pymAtciq 基础上，考虑太阳系内天体的光线偏转
+
+\texttt{pymAtciqz}: 在 pymAtciq 基础上，考虑视差和自行为零的情况
+
+\texttt{pymAticq}: 由 ASTROM 参数将恒星 CIRS 坐标转换为 ICRS 天体测量位置
+
+\texttt{pymAtic13}: 同上，输入时间，由 SOFA 内部函数计算 ASTROM
+
+\texttt{pymAticqn}: 在 pymAticq 基础上，考虑太阳系内天体的光线偏转
+
+\texttt{pymAtoc13}: 基于时间和基本观测参数，将恒星观测坐标转换为 ICRS 天体测量位置
+
+\texttt{pymAtco13}: 将恒星 ICRS 坐标转换为观测者的天体测量位置
+
+\texttt{pymAtoiq}: 由 pymApio[13] 获得的 ASTROM，将恒星观测坐标转换为 CIRS 天体测量位置
+
+\texttt{pymAtoi13}: 同上，输入时间和基本观测参数，由 SOFA 内部函数计算 ASTROM
+
+\texttt{pymAtioq}: 将恒星 CIRS 坐标转换为观测者的天体测量位置
+
+\texttt{pymAtio13}: 输入时间和基本观测参数，将恒星 CIRS 坐标转换为观测者的天体测量位置
+
+\section{错误处理与迁移}
+2.0.0 起所有例程出错一律抛出 \texttt{ValueError}，不再返回状态码、\texttt{-1e9} 哨兵值或
+\texttt{None}。例如非法椭球编号、非法行星编号、非法日期等均直接抛异常。从 1.x 迁移时，
+删除对返回状态码的判断，改用 \texttt{try/except ValueError} 即可。
+
+\end{document}
