@@ -155,11 +155,9 @@ for name in ["DPI", "D2PI", "DAS2R", "DR2AS", "DJ00", "DJC", "DAYSEC",
 
 
 # --- 8. 想按主题分模块用也可以 ---------------------------------------------
-print("\n[8] 分主题导入（两种模块名都行）")
-from PyMsOfa import PyMsOfa_time_n as t_n
+print("\n[8] 分主题导入")
 from PyMsOfa import PyMsOfa_time as t
-assert t.pymCal2jd is t_n.pymCal2jd
-print("  PyMsOfa_time 和 PyMsOfa_time_n 指向同一实现")
+print("  PyMsOfa_time 模块导入成功:", t.pymCal2jd(2024, 2, 27))
 
 print("\n" + "-" * 70)
 print("done")

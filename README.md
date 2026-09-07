@@ -54,14 +54,11 @@ Thematic sub-modules are still available if you prefer to keep the namespaces
 apart:
 
 ```python
-from PyMsOfa import PyMsOfa_time_n           as t      # canonical name
-from PyMsOfa import PyMsOfa_earth_attitude_n as e
-from PyMsOfa import PyMsOfa_astrometry_n     as a
-from PyMsOfa import PyMsOfa_basic_n          as b
+from PyMsOfa import PyMsOfa_time             as t
+from PyMsOfa import PyMsOfa_earth_attitude   as e
+from PyMsOfa import PyMsOfa_astrometry       as a
+from PyMsOfa import PyMsOfa_basic            as b
 from PyMsOfa import sofa_const               as c
-
-# aliases without the `_n` suffix work too
-from PyMsOfa import PyMsOfa_time as t
 ```
 
 ## Package layout
@@ -70,14 +67,10 @@ from PyMsOfa import PyMsOfa_time as t
 PyMsOfa/
 ├── __init__.py                    # flat API: all 247 routines + all constants
 ├── sofa_const.py                  # SOFA constants (sofam.h) + dint/dnint/dsign/gmax/gmin
-├── PyMsOfa_basic_n.py             #  51 routines - vector/matrix & angle utilities
-├── PyMsOfa_time_n.py              #  33 routines - calendars & time scales
-├── PyMsOfa_earth_attitude_n.py    #  96 routines - precession, nutation, Earth rotation
-├── PyMsOfa_astrometry_n.py        #  72 routines - astrometry, ephemerides, geodesy
-├── PyMsOfa_basic.py               # alias of PyMsOfa_basic_n
-├── PyMsOfa_time.py                # alias of PyMsOfa_time_n
-├── PyMsOfa_earth_attitude.py      # alias of PyMsOfa_earth_attitude_n
-└── PyMsOfa_astrometry.py          # alias of PyMsOfa_astrometry_n
+├── PyMsOfa_basic.py               #  51 routines - vector/matrix & angle utilities
+├── PyMsOfa_time.py                #  33 routines - calendars & time scales
+├── PyMsOfa_earth_attitude.py      #  96 routines - precession, nutation, Earth rotation
+└── PyMsOfa_astrometry.py          #  72 routines - astrometry, ephemerides, geodesy
 ```
 
 ## What changed from 1.x to 2.x
