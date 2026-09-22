@@ -1929,3 +1929,63 @@ print(sf.pymAtio13(RI, DI, UTC1, UTC2, DUT1, ELONG, PHI, HM, XP, YP, PHPA, TC, R
 (0.09233952224896334, 1.4077587045135502, -0.09247619879882912, 0.17176534357562356, 2.7100851079884807)
 (0.09233952224896334, 1.4077587045135502, -0.09247619879882912, 0.17176534357562356, 2.7100851079884807)
 ```
+
+
+## 6. Extension: IAU 2006J2 / IAU 2000AR26 precession-nutation model
+
+Besides the 247 official SOFA routines, PyMsOfa ships an *extension* module
+(`PyMsOfa_extension`) with validated algorithms that are not yet part of the
+official SOFA release.  It implements the updated **IAU 2006J2 /
+IAU 2000AR26** precession-nutation model (Liu & Huang 2025, A&A, 703, L21;
+Liu et al. 2026), which re-fits the long-term Earth's J2 variation with a
+parabola and is clearly more consistent with the VLBI celestial-pole offsets.
+All 12 routines follow the same `pym` naming and calling conventions as the
+rest of the package.
+
+`pymP06J2(date1, date2)` : IAU 2006J2 precession quantities (psia, oma, pa, epsa, chia).
+
+`pymObl06J2(date1, date2)` : Mean obliquity of the ecliptic, IAU 2006J2 model.
+
+`pymPfw06J2(date1, date2)` : Fukushima-Williams angles for frame bias and precession, IAU 2006J2 model.
+
+`pymNut00aR26(date1, date2)` : Nutation, IAU 2000AR26 model (IAU 2000A adjusted for the IAU 2006J2 precession).
+
+`pymOppolzer(date1, date2)` : Planetary Oppolzer terms for the Earth's figure axis.
+
+`pymXy06J2(date1, date2)` : CIP X, Y coordinates, IAU 2006J2 / IAU 2000AR26 model.
+
+`pymS06J2(date1, date2, x, y)` : CIO locator s, given the CIP X, Y coordinates.
+
+`pymS06J2direct(date1, date2)` : CIO locator s from its direct series.
+
+`pymXys06J2a(date1, date2)` : CIP X, Y coordinates and the CIO locator s.
+
+`pymEo06J2a(date1, date2)` : Equation of the origins.
+
+`pymPnm06J2a(date1, date2)` : Classical bias-precession-nutation matrix.
+
+`pymC2i06J2a(date1, date2)` : Celestial-to-intermediate matrix.
+
+```python
+import PyMsOfa as sf
+
+date1, date2 = 2469807.5, 0.0     # J2050.0 (TT)
+
+x, y = sf.pymXy06J2(date1, date2)              # CIP coordinates
+s = sf.pymS06J2(date1, date2, x, y)            # CIO locator
+eo = sf.pymEo06J2a(date1, date2)               # equation of the origins
+psia, oma, pa, epsa, chia = sf.pymP06J2(date1, date2)
+dpsi, deps = sf.pymNut00aR26(date1, date2)     # IAU 2000AR26 nutation
+rnpb = sf.pymPnm06J2a(date1, date2)            # BPN matrix (3,3)
+rc2i = sf.pymC2i06J2a(date1, date2)            # celestial-to-intermediate matrix (3,3)
+```
+
+```text
+x, y (mas)                    :  1007921.7165   -11018.4009
+s (uas)                       :     21830.4692
+eo (arcsec)                   :    -2320.3629
+psia, oma, pa, epsa, chia (arcsec):
+   2518.9753  84381.4050  2514.6789  84357.9878  4.6826
+dpsi, deps (mas)              :    15171.5471    -5329.7737
+rnpb / rc2i shape             :    (3, 3)  (3, 3)
+```

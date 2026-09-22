@@ -70,7 +70,9 @@ PyMsOfa/
 ├── PyMsOfa_basic.py               #  51 routines - vector/matrix & angle utilities
 ├── PyMsOfa_time.py                #  33 routines - calendars & time scales
 ├── PyMsOfa_earth_attitude.py      #  96 routines - precession, nutation, Earth rotation
-└── PyMsOfa_astrometry.py          #  72 routines - astrometry, ephemerides, geodesy
+├── PyMsOfa_astrometry.py          #  72 routines - astrometry, ephemerides, geodesy
+├── PyMsOfa_extension.py           #  add-on: IAU 2006J2 / IAU 2000AR26 precession-nutation
+└── iau2006j2_data.py              #  data tables for the extension module
 ```
 
 ## What changed from 1.x to 2.x

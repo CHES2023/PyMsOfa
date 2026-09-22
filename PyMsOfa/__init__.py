@@ -17,6 +17,11 @@ Thematic sub-modules remain importable if you prefer them::
 
     from PyMsOfa import PyMsOfa_time as t
 
+An *extension* sub-module holds algorithms that are not part of the official
+SOFA release (e.g. the IAU 2006J2 / IAU 2000AR26 precession--nutation model)::
+
+    from PyMsOfa import PyMsOfa_extension as sfx
+
 To cite PyMsOfa in publications use:
 
   Ji, Jiang-Hui, Tan, Dong-jie, Bao, Chun-hui, Huang, Xiu-min, Hu, Shoucun,
@@ -43,6 +48,7 @@ from . import PyMsOfa_basic                 # noqa: F401
 from . import PyMsOfa_time                  # noqa: F401
 from . import PyMsOfa_earth_attitude        # noqa: F401
 from . import PyMsOfa_astrometry            # noqa: F401
+from . import PyMsOfa_extension            # noqa: F401
 
 # --- flat API: every constant and every pym* routine at the top level ------
 from .sofa_const import *                   # noqa: F401,F403
@@ -50,6 +56,7 @@ from .PyMsOfa_basic import *                # noqa: F401,F403
 from .PyMsOfa_time import *                 # noqa: F401,F403
 from .PyMsOfa_earth_attitude import *       # noqa: F401,F403
 from .PyMsOfa_astrometry import *           # noqa: F401,F403
+from .PyMsOfa_extension import *           # noqa: F401,F403
 
 
 def _build_all():
@@ -75,6 +82,7 @@ __all__ = _build_all() + [
     "PyMsOfa_time",
     "PyMsOfa_earth_attitude",
     "PyMsOfa_astrometry",
+    "PyMsOfa_extension",
 ]
 
 del _build_all

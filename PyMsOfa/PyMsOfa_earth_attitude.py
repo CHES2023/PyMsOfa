@@ -32,17 +32,38 @@ def pymC2ixys(x, y, s):
     rc2i : ndarray, shape (3,3)
         Celestial-to-intermediate matrix.
     """
-    r2 = x*x + y*y
-    e = np.arctan2(y, x) if r2 > 0.0 else 0.0
-    d = np.arctan(np.sqrt(r2 / (1.0 - r2))) if r2 < 1.0 else np.pi/2
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    s = np.asarray(s, dtype=float)
 
-    # Compose the rotation matrix in a single multiplication
-    #ri   = pymIr()
-    #rc2i = pymRz(-(e + s), ri) @ pymRy(d, ri) @ pymRz(e, ri)
-     
-    rc2i = pymRz(-(e + s)) @ pymRy(d) @ pymRz(e)
-    
-    return rc2i
+    r2 = x*x + y*y
+    e = np.where(r2 != 0.0, np.arctan2(y, x), 0.0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        d = np.where(r2 <= 1.0, np.arctan(np.sqrt(r2 / (1.0 - r2))),
+                     np.pi / 2.0)
+
+    # Rotation about z and y, broadcasting over any trailing batch dims.
+    def _r3(a):
+        c, sn = np.cos(a), np.sin(a)
+        r = np.zeros(np.shape(a) + (3, 3))
+        r[..., 0, 0] = c
+        r[..., 0, 1] = sn
+        r[..., 1, 0] = -sn
+        r[..., 1, 1] = c
+        r[..., 2, 2] = 1.0
+        return r
+
+    def _r2(a):
+        c, sn = np.cos(a), np.sin(a)
+        r = np.zeros(np.shape(a) + (3, 3))
+        r[..., 0, 0] = c
+        r[..., 0, 2] = -sn
+        r[..., 1, 1] = 1.0
+        r[..., 2, 0] = sn
+        r[..., 2, 2] = c
+        return r
+
+    return _r3(-(e + s)) @ _r2(d) @ _r3(e)
 
 
 def pymFw2m(gamb, phib, psi, eps):
@@ -2769,25 +2790,25 @@ def pymEors(rnpb, s):
     eo : float
         Equation of the origins in radians
     """
-    rnpb = np.asarray(rnpb)
+    rnpb = np.asarray(rnpb, dtype=float)
 
     # Extract X, Y, Z components
-    x = rnpb[2, 0]
-    y = rnpb[2, 1]
-    z = rnpb[2, 2]
+    x = rnpb[..., 2, 0]
+    y = rnpb[..., 2, 1]
+    z = rnpb[..., 2, 2]
 
     # Wallace & Capitaine (2006) formula
     ax = x / (1.0 + z)
-    v  = np.array([1.0 - ax*x, -ax*y, -x])  # [xs, ys, zs]
+    xs = 1.0 - ax*x
+    ys = -ax*y
+    zs = -x
 
-    # Vectorized dot product with first two rows
-    pq = rnpb[:2, :] @ v 
-    p, q = pq[0], pq[1]
+    # Dot product with the first two rows
+    p = rnpb[..., 0, 0]*xs + rnpb[..., 0, 1]*ys + rnpb[..., 0, 2]*zs
+    q = rnpb[..., 1, 0]*xs + rnpb[..., 1, 1]*ys + rnpb[..., 1, 2]*zs
 
     # Equation of the origins
-    eo = s - np.arctan2(q, p) if (p != 0.0 or q != 0.0) else s
-    
-    return eo
+    return np.where((p != 0.0) | (q != 0.0), s - np.arctan2(q, p), s)
 
 
 def pymBpn2xy(rbpn):
