@@ -3,12 +3,16 @@
 PyMsOfa_extension
 =================
 
-Pure Python / NumPy subroutines for the updated **IAU 2006J2 / IAU 2000AR26**
-precession-nutation model.
+Pure Python / NumPy subroutines for the updated **IAU 2006J2/2000AR26**
+precession-nutation model, written as an *extension* of the PyMsOfa package.
 
-The routines follow the style of the *PyMsOfa v2* package: function names
+The routines follow the style of the *PyMsOfa v2* package (function names
 ``pym*``, two-part Julian Date arguments ``(date1, date2)``, NumPy
-vectorisation and SOFA-style docstrings.
+vectorisation).  Everything that already exists in the base package --
+SOFA constants, the 14 IERS 2003 fundamental arguments, the rotation
+matrices and matrix helpers, and the IAU 2000A nutation ``pymNut00a`` -- is
+imported from :mod:`sofa_const`, :mod:`PyMsOfa_basic` and
+:mod:`PyMsOfa_earth_attitude` rather than being redefined here.
 
 References
 ----------
@@ -31,9 +35,9 @@ Notes
 -----
 * Fundamental arguments are the 14 IERS Conventions (2003) arguments
   (l, l', F, D, Om and the eight planetary longitudes plus the general
-  precession pA), as used by the SOFA routines.
+  precession pA), imported from :mod:`PyMsOfa_earth_attitude`.
 * CIP/CIO series coefficients are in **microarcsecond** (converted with
-  ``1e-6 * DAS2R``); the nutation series uses 0.1 microarcsecond.
+  ``1e-6 * DAS2R``).
 * The CIO locator ``s`` is evaluated through the compact ``s + XY/2``
   series (mirroring ``iauS06``) and corrected by ``-X*Y/2``.
 * The equation of the origins is assembled as
@@ -46,7 +50,6 @@ pymS06J2(date1, date2, x, y)   -> s           : CIO locator (radians)
 pymS06J2direct(date1, date2)   -> s           : CIO locator, direct series
 pymXys06J2a(date1, date2)      -> x, y, s     : CIP + CIO locator
 pymEo06J2a(date1, date2)       -> eo          : equation of the origins
-pymNut00a(date1, date2)        -> dpsi, deps  : IAU 2000A nutation
 pymNut00aR26(date1, date2)     -> dpsi, deps  : IAU 2000AR26 nutation
 pymOppolzer(date1, date2)      -> dpsi, deps  : planetary Oppolzer terms
 pymP06J2(date1, date2)         -> psia, oma, pa, epsa, chia : precession
@@ -63,21 +66,30 @@ try:                                     # installed inside the package
 except ImportError:                      # flat layout: both files in one folder
     from iau2006j2_data import *
 
+# --- Import shared building blocks from the base package (no duplication). ---
+try:
+    from .sofa_const import DAS2R, DJ00, DJC
+    from .PyMsOfa_earth_attitude import (
+        pymFal03, pymFalp03, pymFaf03, pymFad03, pymFaom03,
+        pymFame03, pymFave03, pymFae03, pymFama03, pymFaju03,
+        pymFasa03, pymFaur03, pymFane03, pymFapa03,
+        pymNut00a, pymFw2m, pymC2ixys,
+    )
+except ImportError:                      # flat layout: all modules in one folder
+    from sofa_const import DAS2R, DJ00, DJC
+    from PyMsOfa_earth_attitude import (
+        pymFal03, pymFalp03, pymFaf03, pymFad03, pymFaom03,
+        pymFame03, pymFave03, pymFae03, pymFama03, pymFaju03,
+        pymFasa03, pymFaur03, pymFane03, pymFapa03,
+        pymNut00a, pymFw2m, pymC2ixys,
+    )
+
 __all__ = [
     "pymXy06J2", "pymS06J2", "pymS06J2direct", "pymXys06J2a", "pymEo06J2a",
     "pymNut00aR26", "pymOppolzer",
     "pymP06J2", "pymPfw06J2", "pymObl06J2",
     "pymPnm06J2a", "pymC2i06J2a",
 ]
-
-# ---------------------------------------------------------------------------
-# SOFA constants (sofa.h / sofam.h)
-# ---------------------------------------------------------------------------
-D2PI = 6.283185307179586476925287          # 2 pi
-DAS2R = 4.848136811095359935899141e-6      # arcseconds -> radians
-DJ00 = 2451545.0                           # Julian Date of J2000.0
-DJC = 36525.0                              # days per Julian century
-TURNAS = 1296000.0                         # arcseconds in a full circle
 
 UAS2R = 1e-6 * DAS2R                       # microarcseconds -> radians
 
@@ -97,9 +109,6 @@ _Y_SERIES = _split(Y_SERIES)
 _S_SERIES = _split(S_SERIES)
 _SP_SERIES = _split(SPLUSXY2_SERIES)
 _EO_SERIES = _split(EO_SERIES)
-
-_NUT_LS = np.asarray(NUT_LS, dtype=float)
-_NUT_PL = np.asarray(NUT_PL, dtype=float)
 
 
 # ---------------------------------------------------------------------------
@@ -125,123 +134,6 @@ OPPOLZER_TERMS = np.array([
     [  2,  -4,   0,   0,   2,   -14,     -1,       6,      -1],  # 2LVe-4LE+2pA   (dir. Venus)
     [  0,   1,   0,  -1,   0,     4,      1,       1,       0],  # LE-LJ          (dir. Jupiter)
 ])
-
-
-# ---------------------------------------------------------------------------
-# Fundamental arguments, IERS Conventions (2003)  (SOFA iauFal03 ... iauFapa03)
-# ---------------------------------------------------------------------------
-def pymFal03(t):
-    """Mean anomaly of the Moon (radians)."""
-    return np.fmod(485868.249036 +
-                   t * (1717915923.2178 +
-                   t * (31.8792 +
-                   t * (0.051635 +
-                   t * (-0.00024470)))), TURNAS) * DAS2R
-
-
-def pymFalp03(t):
-    """Mean anomaly of the Sun (radians)."""
-    return np.fmod(1287104.793048 +
-                   t * (129596581.0481 +
-                   t * (-0.5532 +
-                   t * (0.000136 +
-                   t * (-0.00001149)))), TURNAS) * DAS2R
-
-
-def pymFaf03(t):
-    """Mean longitude of the Moon minus that of the ascending node (radians)."""
-    return np.fmod(335779.526232 +
-                   t * (1739527262.8478 +
-                   t * (-12.7512 +
-                   t * (-0.001037 +
-                   t * (0.00000417)))), TURNAS) * DAS2R
-
-
-def pymFad03(t):
-    """Mean elongation of the Moon from the Sun (radians)."""
-    return np.fmod(1072260.703692 +
-                   t * (1602961601.2090 +
-                   t * (-6.3706 +
-                   t * (0.006593 +
-                   t * (-0.00003169)))), TURNAS) * DAS2R
-
-
-def pymFaom03(t):
-    """Mean longitude of the ascending node of the Moon (radians)."""
-    return np.fmod(450160.398036 +
-                   t * (-6962890.5431 +
-                   t * (7.4722 +
-                   t * (0.007702 +
-                   t * (-0.00005939)))), TURNAS) * DAS2R
-
-
-def pymFame03(t):
-    """Mean longitude of Mercury (radians)."""
-    return np.fmod(4.402608842 + 2608.7903141574 * t, D2PI)
-
-
-def pymFave03(t):
-    """Mean longitude of Venus (radians)."""
-    return np.fmod(3.176146697 + 1021.3285546211 * t, D2PI)
-
-
-def pymFae03(t):
-    """Mean longitude of the Earth (radians)."""
-    return np.fmod(1.753470314 + 628.3075849991 * t, D2PI)
-
-
-def pymFama03(t):
-    """Mean longitude of Mars (radians)."""
-    return np.fmod(6.203480913 + 334.0612426700 * t, D2PI)
-
-
-def pymFaju03(t):
-    """Mean longitude of Jupiter (radians)."""
-    return np.fmod(0.599546497 + 52.9690962641 * t, D2PI)
-
-
-def pymFasa03(t):
-    """Mean longitude of Saturn (radians)."""
-    return np.fmod(0.874016757 + 21.3299104960 * t, D2PI)
-
-
-def pymFaur03(t):
-    """Mean longitude of Uranus (radians)."""
-    return np.fmod(5.481293872 + 7.4781598567 * t, D2PI)
-
-
-def pymFane03(t):
-    """Mean longitude of Neptune (radians)."""
-    return np.fmod(5.311886287 + 3.8133035638 * t, D2PI)
-
-
-def pymFapa03(t):
-    """General accumulated precession in longitude (radians)."""
-    return (0.024381750 + 0.00000538691 * t) * t
-
-
-def pymFundArgs(t):
-    """
-    The 14 fundamental arguments used by the CIP/CIO series, in the order of
-    the coefficient tables::
-
-        [ l, l', F, D, Om, LMe, LVe, LE, LMa, LJ, LSa, LU, LNe, pA ]
-
-    Parameters
-    ----------
-    t : float or ndarray
-        Julian centuries since J2000.0 (TT).
-
-    Returns
-    -------
-    ndarray, shape (14,) or (14, N)
-        Fundamental arguments in radians.
-    """
-    return np.array([
-        pymFal03(t), pymFalp03(t), pymFaf03(t), pymFad03(t), pymFaom03(t),
-        pymFame03(t), pymFave03(t), pymFae03(t), pymFama03(t), pymFaju03(t),
-        pymFasa03(t), pymFaur03(t), pymFane03(t), pymFapa03(t),
-    ])
 
 
 # ---------------------------------------------------------------------------
@@ -278,179 +170,33 @@ def _pn_series(t, poly, series, fa):
     return val
 
 
-# ---------------------------------------------------------------------------
-# Rotation matrices and matrix helpers (SOFA iauIr / iauRx / iauRy / iauRz)
-# ---------------------------------------------------------------------------
-def pymIr():
-    """Identity rotation matrix, shape (3, 3)."""
-    return np.eye(3)
-
-
-def pymRx(phi):
-    """Rotation about the x-axis by angle phi (radians)."""
-    s, c = np.sin(phi), np.cos(phi)
-    return np.array([[1.0, 0.0, 0.0],
-                     [0.0, c, s],
-                     [0.0, -s, c]])
-
-
-def pymRy(theta):
-    """Rotation about the y-axis by angle theta (radians)."""
-    s, c = np.sin(theta), np.cos(theta)
-    return np.array([[c, 0.0, -s],
-                     [0.0, 1.0, 0.0],
-                     [s, 0.0, c]])
-
-
-def pymRz(psi):
-    """Rotation about the z-axis by angle psi (radians)."""
-    s, c = np.sin(psi), np.cos(psi)
-    return np.array([[c, s, 0.0],
-                     [-s, c, 0.0],
-                     [0.0, 0.0, 1.0]])
-
-
-def pymFw2m(gamb, phib, psi, eps):
-    """Rotation matrix from Fukushima-Williams angles:  R1(-eps).R3(-psi).R1(phib).R3(gamb)."""
-    return pymRx(-eps) @ pymRz(-psi) @ pymRx(phib) @ pymRz(gamb)
-
-
-def pymFw2xy(gamb, phib, psi, eps):
-    """CIP X, Y from Fukushima-Williams bias-precession-nutation angles."""
-    return pymBpn2xy(pymFw2m(gamb, phib, psi, eps))
-
-
-def pymBpn2xy(rbpn):
-    """Extract the CIP X, Y coordinates from a bias-precession-nutation matrix."""
-    rbpn = np.asarray(rbpn)
-    return rbpn[2, 0], rbpn[2, 1]
-
-
-def pymC2ixys(x, y, s):
-    """Form the celestial-to-intermediate matrix given CIP X, Y and CIO locator s."""
-    x = np.asarray(x, dtype=float)
-    y = np.asarray(y, dtype=float)
-    s = np.asarray(s, dtype=float)
-
-    r2 = x * x + y * y
-    e = np.where(r2 != 0.0, np.arctan2(y, x), 0.0)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        d = np.where(r2 <= 1.0, np.arctan(np.sqrt(r2 / (1.0 - r2))),
-                     np.pi / 2.0)
-
-    # Rotation about z and y, broadcasting over any trailing batch dims.
-    def _r3(a):
-        c, sn = np.cos(a), np.sin(a)
-        r = np.zeros(np.shape(a) + (3, 3))
-        r[..., 0, 0] = c
-        r[..., 0, 1] = sn
-        r[..., 1, 0] = -sn
-        r[..., 1, 1] = c
-        r[..., 2, 2] = 1.0
-        return r
-
-    def _r2(a):
-        c, sn = np.cos(a), np.sin(a)
-        r = np.zeros(np.shape(a) + (3, 3))
-        r[..., 0, 0] = c
-        r[..., 0, 2] = -sn
-        r[..., 1, 1] = 1.0
-        r[..., 2, 0] = sn
-        r[..., 2, 2] = c
-        return r
-
-    return _r3(-(e + s)) @ _r2(d) @ _r3(e)
-
-
-def pymC2ixy(date1, date2, x, y):
-    """Form the celestial-to-intermediate matrix given CIP X, Y (IAU 2006J2)."""
-    return pymC2ixys(x, y, pymS06J2(date1, date2, x, y))
-
-
-def pymEors(rnpb, s):
-    """Equation of the origins, given the classical NPB matrix and CIO locator s."""
-    rnpb = np.asarray(rnpb, dtype=float)
-    x = rnpb[..., 2, 0]
-    y = rnpb[..., 2, 1]
-    z = rnpb[..., 2, 2]
-    ax = x / (1.0 + z)
-    xs = 1.0 - ax * x
-    ys = -ax * y
-    zs = -x
-    p = rnpb[..., 0, 0] * xs + rnpb[..., 0, 1] * ys + rnpb[..., 0, 2] * zs
-    q = rnpb[..., 1, 0] * xs + rnpb[..., 1, 1] * ys + rnpb[..., 1, 2] * zs
-    return np.where((p != 0.0) | (q != 0.0), s - np.arctan2(q, p), s)
-
-
-# ---------------------------------------------------------------------------
-# IAU 2000A nutation  (SOFA iauNut00a)
-# ---------------------------------------------------------------------------
-def pymNut00a(date1, date2):
+def pymFundArgs(t):
     """
-    Nutation, IAU 2000A model (MHB2000).
+    The 14 fundamental arguments used by the CIP/CIO series, in the order of
+    the coefficient tables::
+
+        [ l, l', F, D, Om, LMe, LVe, LE, LMa, LJ, LSa, LU, LNe, pA ]
 
     Parameters
     ----------
-    date1, date2 : float
-        TT as a 2-part Julian Date.
+    t : float or ndarray
+        Julian centuries since J2000.0 (TT).
 
     Returns
     -------
-    dpsi, deps : float
-        Nutation in longitude and obliquity (radians).
+    ndarray, shape (14,) or (14, N)
+        Fundamental arguments in radians.
     """
-    t = _t(date1, date2)
-    U2R = DAS2R / 1e7                     # 0.1 microarcsecond -> radian
-
-    # Luni-solar fundamental arguments (IERS 2003).
-    el = pymFal03(t)
-    elp = pymFalp03(t)
-    f = pymFaf03(t)
-    d = pymFad03(t)
-    om = pymFaom03(t)
-
-    # Planetary fundamental arguments (MHB2000 for l, F, D, Om, Neptune).
-    al = np.fmod(2.35555598 + 8328.6914269554 * t, D2PI)
-    af = np.fmod(1.627905234 + 8433.466158131 * t, D2PI)
-    ad = np.fmod(5.198466741 + 7771.3771468121 * t, D2PI)
-    aom = np.fmod(2.18243920 - 33.757045 * t, D2PI)
-    alme = pymFame03(t)
-    alve = pymFave03(t)
-    alea = pymFae03(t)
-    alma = pymFama03(t)
-    alju = pymFaju03(t)
-    alsa = pymFasa03(t)
-    alur = pymFaur03(t)
-    alne = np.fmod(5.321159000 + 3.8127774000 * t, D2PI)
-    apa = pymFapa03(t)
-
-    # Luni-solar nutation.
-    arg = np.fmod(_NUT_LS[:, 0] * el + _NUT_LS[:, 1] * elp +
-                  _NUT_LS[:, 2] * f + _NUT_LS[:, 3] * d +
-                  _NUT_LS[:, 4] * om, D2PI)
-    sarg = np.sin(arg)
-    carg = np.cos(arg)
-    dpsils = ((_NUT_LS[:, 5] + _NUT_LS[:, 6] * t) @ sarg +
-              _NUT_LS[:, 7] @ carg) * U2R
-    depsls = ((_NUT_LS[:, 8] + _NUT_LS[:, 9] * t) @ carg +
-              _NUT_LS[:, 10] @ sarg) * U2R
-
-    # Planetary nutation.
-    arg = np.fmod(_NUT_PL[:, 0] * al + _NUT_PL[:, 1] * af +
-                  _NUT_PL[:, 2] * ad + _NUT_PL[:, 3] * aom +
-                  _NUT_PL[:, 4] * alme + _NUT_PL[:, 5] * alve +
-                  _NUT_PL[:, 6] * alea + _NUT_PL[:, 7] * alma +
-                  _NUT_PL[:, 8] * alju + _NUT_PL[:, 9] * alsa +
-                  _NUT_PL[:, 10] * alur + _NUT_PL[:, 11] * alne +
-                  _NUT_PL[:, 12] * apa, D2PI)
-    sarg = np.sin(arg)
-    carg = np.cos(arg)
-    dpsipl = (_NUT_PL[:, 13] @ sarg + _NUT_PL[:, 14] @ carg) * U2R
-    depspl = (_NUT_PL[:, 15] @ sarg + _NUT_PL[:, 16] @ carg) * U2R
-
-    return dpsils + dpsipl, depsls + depspl
+    return np.array([
+        pymFal03(t), pymFalp03(t), pymFaf03(t), pymFad03(t), pymFaom03(t),
+        pymFame03(t), pymFave03(t), pymFae03(t), pymFama03(t), pymFaju03(t),
+        pymFasa03(t), pymFaur03(t), pymFane03(t), pymFapa03(t),
+    ])
 
 
+# ---------------------------------------------------------------------------
+# IAU 2000AR26 nutation  (IAU 2000A nutation + R26 adjustments)
+# ---------------------------------------------------------------------------
 def pymOppolzer(date1, date2):
     """
     Planetary Oppolzer terms for the Earth's figure axis (complete table of
@@ -596,7 +342,7 @@ def pymPfw06J2(date1, date2):
 
 
 # ---------------------------------------------------------------------------
-# IAU 2006J2 / IAU 2000AR26 CIP and CIO quantities
+# IAU 2006J2/2000AR26 CIP and CIO quantities
 # ---------------------------------------------------------------------------
 def _xy(t, fa):
     """CIP X, Y (radians) from the precomputed century t and arguments fa."""
@@ -607,8 +353,7 @@ def _xy(t, fa):
 
 def pymXy06J2(date1, date2):
     """
-    X, Y coordinates of the celestial intermediate pole, IAU 2006J2 /
-    IAU 2000AR26 model (series-based).
+    X, Y coordinates of the celestial intermediate pole, IAU 2006J2/2000AR26 model (series-based).
 
     Parameters
     ----------
@@ -632,8 +377,7 @@ def _s(t, fa, x, y):
 
 def pymS06J2(date1, date2, x, y):
     """
-    The CIO locator s, given the CIP X, Y coordinates, IAU 2006J2 /
-    IAU 2000AR26 model.
+    The CIO locator s, given the CIP X, Y coordinates, IAU 2006J2/2000AR26 model.
 
     The series is actually for ``s + X*Y/2`` (more compact than a direct
     series for s); the result is corrected by ``-X*Y/2``, exactly as in the
@@ -666,8 +410,7 @@ def pymS06J2direct(date1, date2):
 
 def pymXys06J2a(date1, date2):
     """
-    X, Y coordinates of the CIP and the CIO locator s, IAU 2006J2 /
-    IAU 2000AR26 model.
+    X, Y coordinates of the CIP and the CIO locator s, IAU 2006J2/2000AR26 model.
 
     Returns
     -------
@@ -682,7 +425,7 @@ def pymXys06J2a(date1, date2):
 
 def pymEo06J2a(date1, date2):
     """
-    Equation of the origins, IAU 2006J2 / IAU 2000AR26 model.
+    Equation of the origins, IAU 2006J2/2000AR26 model.
 
     Following Liu et al. (2026, Eqs. 63-66), the EO is assembled as::
 
@@ -707,8 +450,7 @@ def pymEo06J2a(date1, date2):
 # ---------------------------------------------------------------------------
 def pymPnm06J2a(date1, date2):
     """
-    Form the classical bias-precession-nutation matrix, IAU 2006J2 /
-    IAU 2000AR26 model.
+    Form the classical bias-precession-nutation matrix, IAU 2006J2/2000AR26 model.
 
     Returns
     -------
@@ -722,7 +464,7 @@ def pymPnm06J2a(date1, date2):
 
 def pymC2i06J2a(date1, date2):
     """
-    Form the celestial-to-intermediate matrix, IAU 2006J2 / IAU 2000AR26 model.
+    Form the celestial-to-intermediate matrix, IAU 2006J2/2000AR26 model.
 
     Returns
     -------
