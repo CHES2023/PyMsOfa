@@ -35,7 +35,7 @@ This file is hand-written.  When bumping the version, change BOTH
 ``__version__`` below and ``version`` in ``pyproject.toml``.
 """
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 __author__ = "Ji, Jianghui"
 __license__ = "MIT"
 
