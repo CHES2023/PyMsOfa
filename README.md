@@ -151,6 +151,8 @@ other fields.
 
 ## Licence and acknowledgement
 
+This product is a derived work of the IAU SOFA service; see NOTICE.
+
 `PyMsOfa` is **not** a part of the SOFA routines; it is an independent Python
 implementation of the algorithms published by the IAU SOFA Board.  It is
 neither distributed, supported nor endorsed by the International Astronomical
