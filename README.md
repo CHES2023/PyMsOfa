@@ -138,7 +138,7 @@ no `None` placeholders anywhere in the public API.
 If you need the old behaviour, pin the previous release:
 
 ```bash
-pip install "PyMsOfa==1.1.6"
+pip install PyMsOfa
 ```
 
 ## Applications
