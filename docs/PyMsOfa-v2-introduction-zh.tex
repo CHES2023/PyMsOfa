@@ -698,21 +698,6 @@ IAU 2000AR26}岁差-章动模型（Liu \& Huang 2025, A\&A, 703, L21；Liu et al
 \texttt{pymPnm06J2a}: 偏差-岁差-章动（BPN）矩阵
 
 \texttt{pymC2i06J2a}: 天球到中间参考系矩阵
-
-示例（TT 儒略日 J2050.0，\texttt{date1=2469807.5, date2=0.0}）：
-
-\begin{verbatim}
-import PyMsOfa as sf
-x, y = sf.pymXy06J2(date1, date2)          # CIP 坐标
-psia, oma, pa, epsa, chia = sf.pymP06J2(date1, date2)
-dpsi, deps = sf.pymNut00aR26(date1, date2) # IAU 2000AR26 章动
-rnpb = sf.pymPnm06J2a(date1, date2)        # BPN 矩阵
-rc2i = sf.pymC2i06J2a(date1, date2)        # 天球-中间参考系矩阵
-\end{verbatim}
-
-此时 $p_A = 2514.68''$、$\varepsilon_A = 84357.99''$、$\Delta\psi = 15171.5$ mas、
-$\Delta\varepsilon = -5329.8$ mas。
-
 \section{错误处理与迁移}
 2.0.0 起所有例程出错一律抛出 \texttt{ValueError}，不再返回状态码、\texttt{-1e9} 哨兵值或
 \texttt{None}。例如非法椭球编号、非法行星编号、非法日期等均直接抛异常。从 1.x 迁移时，
