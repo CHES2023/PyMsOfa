@@ -5,6 +5,8 @@ Done    on Mon Oct  26 18:35:26 2025
 Description: SOFA Astrometry
 """
 
+import warnings
+
 import numpy as np
 try:                                  # installed as part of the PyMsOfa package
     from .sofa_const import *
@@ -2218,10 +2220,11 @@ def pymPmsafe(ra1, dec1, pmr1, pmd1, px1, rv1,
     ra2, dec2, pmr2, pmd2, px2, rv2 : float
         Updated star parameters at the new epoch
 
-    Raises
-    ------
-    ValueError
-        If distance is overridden, velocity is excessive, or solution didn't converge.
+    Warns
+    -----
+    UserWarning
+        If the parallax was too small and the distance was overridden. The
+        returned values are still valid.
     """
 
     # Minimum allowed parallax (arcsec)
@@ -2248,12 +2251,11 @@ def pymPmsafe(ra1, dec1, pmr1, pmd1, px1, rv1,
     #except Exception as e:
     #    raise ValueError(pym_pm_safe_msg[-1]) from e
 
-    # Raise warnings as ValueError if any
-     
+    # As in SOFA, an overridden distance is a warning: the results are valid.
     if status != 0:
-        messages = [msg for idx, msg in pym_pm_safe_msg.items() if idx > 0 and 
+        messages = [msg for idx, msg in pym_pm_safe_msg.items() if idx > 0 and
                     (status & idx)]
-        raise ValueError("; ".join(messages))
+        warnings.warn("; ".join(messages), stacklevel=2)
 
     return ra2, dec2, pmr2, pmd2, px2, rv2
 
